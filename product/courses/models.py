@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Course(models.Model):
@@ -18,7 +21,22 @@ class Course(models.Model):
         verbose_name='Дата и время начала курса'
     )
 
-    # TODO
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Стоимость',
+    )
+
+    users = models.ManyToManyField(
+        User,
+        verbose_name='Студенты',
+        related_name='courses'
+    )
+
+    available = models.BooleanField(
+        default=True,
+        verbose_name='Доступность продукта'
+    )
 
     class Meta:
         verbose_name = 'Курс'
@@ -41,7 +59,11 @@ class Lesson(models.Model):
         verbose_name='Ссылка',
     )
 
-    # TODO
+    course = models.ForeignKey(
+        Course,
+        related_name='lessons',
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name = 'Урок'
@@ -55,7 +77,21 @@ class Lesson(models.Model):
 class Group(models.Model):
     """Модель группы."""
 
-    # TODO
+    title = models.CharField(
+        max_length=250,
+        verbose_name='Название',
+    )
+    course = models.ForeignKey(
+        Course,
+        verbose_name='Курс',
+        related_name='course_groups',
+        on_delete=models.CASCADE
+    )
+    users = models.ManyToManyField(
+        User,
+        verbose_name='Участники группы',
+        related_name='user_groups'
+    )
 
     class Meta:
         verbose_name = 'Группа'
